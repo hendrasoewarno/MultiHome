@@ -63,3 +63,8 @@ else
         fi
 fi
 ```
+
+## Menungkinkan ping dari masing-masing interface
+
+ip rule add from $IP1 lookup LINTAS
+ip rule add from $IP2 lookup TELKOM
