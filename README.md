@@ -1,4 +1,4 @@
-# MultiHome
+# MultiHomed
 Konfigurasi Server yang memiliki beberapa interface active ke Internet, dimana masing-masing interface harus aktif untuk melayani koneksi masuk dan keluar pada interface yang sama.
 
 Kemudian juga perlu script untuk kemampuan pindah GW untuk koneksi dalam keluar
