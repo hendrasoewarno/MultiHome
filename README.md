@@ -18,7 +18,7 @@ Demikian gambaran pemikiran saya, silakan dikembangkan
 Lebih lanjut.
 ```
 #! /bin/bash
-targetip="www.detikfdsfasdf.com"
+targetip="www.google.com"
 
 now="$(date)"
 aktif="`cat aktif.log`"
@@ -73,12 +73,53 @@ ip rule add from $IP2 lookup TELKOM
 
 ## Menggunakan pendekatan curl
 ```
-# !/bin/bash
+#! /bin/bash
+targeturl="https://www.google.com"
 
-curl -Is --interface enp0s3 https://www.google.com | head -1 | grep 200
+now="$(date)"
+aktif="`cat aktif.log`"
+
+ipgwutama="xxx.xxx.xxx.xxx"
+nicutama="enp4s0"
+
+ipgwcadangan="xxx.xxx.xxx.xxx"
+niccadangan="enp8s0"
+
+#coba get url melalui interface utama
+curl -Is --interface  $nicutama https://www.google.com | head -1 | grep 200
+
 if [ $? -eq 0 ]; then
-  echo "Online"
+then
+        echo "jaringan utama OK"
+
+        #jika gw aktif di jaringan cadangan, maka perlu dikembalikan ke jaringan utama
+        if [ "$aktif" == "2" ]
+        then
+                echo "$now jaringan utama sambung, diputuskan gw dikembalikan ke jaringan utama" >> jaringan.log
+                #route del default
+                #route add default gw $ipgwutama $nicutama
+                echo "1" > aktif.log
+        fi
 else
-  echo "Offline"
+        echo "$now jaringan utama FAILED"
+
+        curl -Is --interface  $niccadangan https://www.google.com | head -1 | grep 200
+
+        if [ $? -eq 0 ]; then
+        then
+                echo "$now jaringan cadangan OK"
+
+                #jika gw aktif di jaringan utama, maka perlu diganti ke jaringan cadangan
+                if [ "$aktif" == "1" ]
+                then
+                        echo "$now jaringan utama putus dan jaringan cadangan sambung, diputuskan gw diganti ke jaringan cadangan" >> jaringan.log
+                        #route del default
+                        #route add default gw $ipgwcadangan $niccadangan
+                        echo "2" > aktif.log
+                fi
+        else
+                echo "$now jaringan cadangan juga FAILED"
+                #tidak ada hal yang dapat diputuskan, karena jaringan utama maupun cadangan putus
+        fi
 fi
 ```
