@@ -66,5 +66,19 @@ fi
 
 ## Menungkinkan ping dari masing-masing interface
 
+```
 ip rule add from $IP1 lookup LINTAS
 ip rule add from $IP2 lookup TELKOM
+```
+
+## Menggunakan pendekatan curl
+```
+# !/bin/bash
+
+curl -Is --interface enp0s3 https://www.google.com | head -1 | grep 200
+if [ $? -eq 0 ]; then
+  echo "Online"
+else
+  echo "Offline"
+fi
+```
